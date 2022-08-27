@@ -1,22 +1,17 @@
 package com.home.english.services;
 
-import com.home.english.dao.Users;
-import com.home.english.dao.WordForStudy;
-
-import java.util.Set;
+import com.home.english.dto.UsersDto;
+import com.home.english.dto.WordForStudyDto;
 
 public interface EnglishServices {
-    WordForStudy getWordForCheck();
+    WordForStudyDto getWordForStudyDto(Long id);
 
-    WordForStudy addWord();
+    UsersDto getUsersDto(Long id);
 
-    void addUser(Users user);
+    void addWord(WordForStudyDto wordDto);
 
-    Set<String> getSetLogins();
+    void addUser(UsersDto usersDto);
 
-    Users getUserIfExist(String login, String password);
-
-    Users getUserById(Long id);
-
-    void addWordForStudy(WordForStudy wordForStudy);
+    void checkWord(WordForStudyDto wordDto);
 }
+
