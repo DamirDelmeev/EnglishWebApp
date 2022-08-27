@@ -1,70 +1,58 @@
 package com.home.english.services;
 
-import com.home.english.dao.Users;
 import com.home.english.dao.WordForStudy;
+import com.home.english.dto.UsersDto;
+import com.home.english.dto.WordForStudyDto;
+import com.home.english.mapper.UsersMapper;
+import com.home.english.mapper.WordsMapper;
 import com.home.english.repository.UserRepository;
 import com.home.english.repository.WordsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
 public class EnglishServicesImpl implements EnglishServices {
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    WordsRepository wordsRepository;
+    private WordsRepository wordsRepository;
+
+    @Autowired
+    private WordsMapper wordsMapper;
+
+    @Autowired
+    private UsersMapper usersMapper;
 
     @Override
-    public WordForStudy getWordForCheck() {
-        List<WordForStudy> allWords = wordsRepository.findAll();
-        List<WordForStudy> wordsCurrentUser = allWords.stream()
-                .filter(wordForStudy -> wordForStudy.getUsers().getId() == 1)
+    public WordForStudyDto getWordForStudyDto(Long id) {
+        List<WordForStudy> allById = wordsRepository.findAllById(id).stream()
+                .filter(wordForStudy -> wordForStudy.getSuccessCounter() < 3)
                 .collect(Collectors.toList());
-        return wordsCurrentUser.get(ThreadLocalRandom.current().nextInt(0, wordsCurrentUser.size()));
+        return wordsMapper
+                .wordInWordDto(allById.get(ThreadLocalRandom.current().nextInt(0, allById.size() - 1)));
     }
 
     @Override
-    public WordForStudy addWord() {
-        return null;
+    public UsersDto getUsersDto(Long id) {
+        return usersMapper.usersInUsersDto(userRepository.findById(id).get());
     }
 
     @Override
-    public void addUser(Users user) {
-        userRepository.save(user);
+    public void addWord(WordForStudyDto wordDto) {
+        wordsRepository.save(wordsMapper.wordDtoInWord(wordDto));
     }
 
     @Override
-    public Set<String> getSetLogins() {
-
-        return userRepository.findAll().stream()
-                .map(Users::getLogin)
-                .collect(Collectors.toSet());
+    public void addUser(UsersDto usersDto) {
+        userRepository.save(usersMapper.usersDtoInUsers(usersDto));
     }
 
     @Override
-    public Users getUserIfExist(String login, String password) {
-        List<Users> collect = userRepository.findAll().stream()
-                .filter(user -> user.getLogin().equals(login) & user.getPass().equals(password))
-                .collect(Collectors.toList());
-        return collect.get(0) != null ? collect.get(0) : null;
+    public void checkWord(WordForStudyDto wordDto) {
+        wordsRepository.save(wordsMapper.wordDtoInWord(wordDto));
     }
-
-    @Override
-    public Users getUserById(Long id) {
-        Optional<Users> byId = userRepository.findById(id);
-        return byId.get();
-    }
-
-    @Override
-    public void addWordForStudy(WordForStudy wordForStudy) {
-        wordsRepository.save(wordForStudy);
-    }
-
-
 }
