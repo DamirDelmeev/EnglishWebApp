@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface WordsRepository extends JpaRepository<WordForStudy, Long> {
-    List<WordForStudy> findAllById(Long id);
+    List<WordForStudy> findAllByUsersId(Long id);
+
+    WordForStudy findFirstByWordIs(String word);
 }

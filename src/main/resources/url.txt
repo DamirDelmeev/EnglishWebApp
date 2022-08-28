@@ -1,0 +1,2 @@
+http://localhost:6002/v2/api-docs  -json
+http://localhost:6002/swagger-ui/  -gui

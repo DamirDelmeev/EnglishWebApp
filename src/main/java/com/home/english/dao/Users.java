@@ -1,6 +1,7 @@
 package com.home.english.dao;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -29,9 +30,11 @@ public class Users {
     @OneToMany(mappedBy = "users", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<WordForStudy> words;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Set<Role> roles;
 }

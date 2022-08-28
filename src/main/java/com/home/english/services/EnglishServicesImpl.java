@@ -29,9 +29,12 @@ public class EnglishServicesImpl implements EnglishServices {
 
     @Override
     public WordForStudyDto getWordForStudyDto(Long id) {
-        List<WordForStudy> allById = wordsRepository.findAllById(id).stream()
+        List<WordForStudy> allById = wordsRepository.findAllByUsersId(id).stream()
                 .filter(wordForStudy -> wordForStudy.getSuccessCounter() < 3)
                 .collect(Collectors.toList());
+        if (allById.size() - 1 == 0) {
+            return wordsMapper.wordInWordDto(allById.get(0));
+        }
         return wordsMapper
                 .wordInWordDto(allById.get(ThreadLocalRandom.current().nextInt(0, allById.size() - 1)));
     }
@@ -53,6 +56,11 @@ public class EnglishServicesImpl implements EnglishServices {
 
     @Override
     public void checkWord(WordForStudyDto wordDto) {
-        wordsRepository.save(wordsMapper.wordDtoInWord(wordDto));
+        WordForStudy wordFromDb = wordsRepository.findFirstByWordIs(wordDto.getWord());
+        if (wordFromDb.getTranslation().equals(wordDto.getTranslation())) {
+            wordDto.setSuccessCounter(wordFromDb.getSuccessCounter() + 1);
+            wordDto.setId(wordFromDb.getId());
+            wordsRepository.save(wordsMapper.wordDtoInWord(wordDto));
+        }
     }
 }
